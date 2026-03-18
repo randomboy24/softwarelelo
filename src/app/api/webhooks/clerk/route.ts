@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const secret = "whsec_tqzcPQ/w21s4ipzK+IdhCYUOzTocRyOs";
+  const secret = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!secret) {
     return NextResponse.json(
@@ -62,17 +62,22 @@ export async function POST(req: Request) {
     // };
 
     // const prisma = new PrismaClient();
-    const dbUser = await prisma.user.create({
-      data: {
-        email: user.email_addresses?.[0]?.email_address,
-        id: user.id,
-        firstName: user.first_name,
-        lastName: user.last_name,
-      },
-    });
 
-    console.log("Create user in DB:", dbUser);
-    // await db.user.create({ data: newUser })
+    try {
+      const dbUser = await prisma.user.create({
+        data: {
+          email: user.email_addresses?.[0]?.email_address,
+          id: user.id,
+          firstName: user.first_name,
+          lastName: user.last_name,
+        },
+      });
+
+      console.log("Create user in DB:", dbUser);
+      // await db.user.create({ data: newUser })
+    } catch (error) {
+      console.log("Error creating user in DB:", error);
+    }
   }
 
   return NextResponse.json({ success: true });
